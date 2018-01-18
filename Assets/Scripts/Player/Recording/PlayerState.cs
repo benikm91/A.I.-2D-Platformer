@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public struct PlayerState
@@ -31,57 +30,12 @@ public struct PlayerState
         _animatorParams = animatorParams;
     }
 
-    public void Apply(GameObject to, Animator animator) 
+    public void Apply(GameObject to, Animator animator)
     {
         to.transform.position = _position;
         to.transform.localScale = _localScale;
         animator.SetBool("grounded", _animatorParams._grounded);
         animator.SetFloat("velocityX", _animatorParams._velocityX);
         animator.SetBool("jetpackUse", _animatorParams._jetpackUse);
-    }
-}
-
-[RequireComponent(typeof(Animator))]
-public class PlayerRecorder : MonoBehaviour
-{
-    
-    private Animator _animator;
-
-    private event System.Action OnFixedUpdate;
-
-    public Queue<PlayerState> PlayBack = null;
-    private IList<PlayerState> _recording = new List<PlayerState>();
-
-    public void InsertRecording() 
-    {
-        _recording.Add(new PlayerState(transform, _animator));
-    }
-
-    public void StartRecording() 
-    {
-        OnFixedUpdate += InsertRecording;
-    }
-
-    public IList<PlayerState> StopRecording() 
-    {
-        OnFixedUpdate -= InsertRecording;
-        var result = _recording;
-        _recording = new List<PlayerState>();
-        return result;
-    }
-
-    void Awake() 
-    {
-        _animator = GetComponent<Animator>();
-    }
-
-    void FixedUpdate()
-    {
-        if (PlayBack != null && PlayBack.Count > 0) 
-        {
-            var recording = PlayBack.Dequeue();
-            recording.Apply(gameObject, _animator);
-        }
-        if (OnFixedUpdate != null) OnFixedUpdate.Invoke();
     }
 }
